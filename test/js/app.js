@@ -2,6 +2,10 @@ $(document).ready(function () {
     "use strict";
 
     new Infinitum({
+        name: 'title',
+        body: 'text.body',
+        url: 'image'
+    }, {
         container: ".container",
         contentClass: 'row',
         nextPagePath: 'next_page',
@@ -10,9 +14,5 @@ $(document).ready(function () {
         endMessage: "No more items...",
         animation: 'pop-in',
         waitForImages: true
-    },{
-        name: 'title',
-        body: 'text.body',
-        url: 'image'
     });
 });

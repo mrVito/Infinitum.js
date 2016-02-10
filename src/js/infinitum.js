@@ -1,7 +1,7 @@
 var Infinitum = (function () {
     "use strict";
 
-    function Infinitum(options, map)
+    function Infinitum(map, options)
     {
         this.defaults = {
             debug: false,
