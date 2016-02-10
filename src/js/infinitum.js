@@ -13,8 +13,11 @@ var Infinitum = (function () {
             sourceAttr: 'data-load',
             dataPath: 'data',
             nextPagePath: 'next_page',
+            totalPagesPath: 'total_pages',
             offset: 0,
-            endMessage: 'No more items to load...'
+            endMessage: 'No more items to load...',
+            animation: null,
+            waitForImages: false
         };
 
         this.options = $.extend({}, this.defaults, options);
@@ -27,9 +30,10 @@ var Infinitum = (function () {
         this.message = this.insertMessage();
         this.scrollHelper = this.insertScrollHelper();
         this.nextPage = this.parseSource();
+        this.totalPages = 0;
+        this.page = 0;
         this.loading = false;
         this.canLoad = true;
-        this.page = 1;
 
         this.bindEvents();
 
@@ -158,7 +162,7 @@ var Infinitum = (function () {
     Infinitum.prototype.load = function () {
         this.loading = true;
 
-        if(this.nextPage === void 0) {
+        if( ! this.nextPage || this.nextPage === void 0) {
             this.container.trigger('infinitum:end');
         }
 
@@ -168,6 +172,7 @@ var Infinitum = (function () {
             success: function (data) {
                 this.renderResponse(data);
                 this.parseNextPage(data);
+                this.parseTotalPages(data);
                 this.container.trigger('infinitum:loaded');
             }.bind(this),
             error: function (data) {
@@ -245,6 +250,19 @@ var Infinitum = (function () {
     };
 
     /**
+     * Parse total page count from server response
+     *
+     * @param {object} response
+     */
+    Infinitum.prototype.parseTotalPages = function (response) {
+        if(this.totalPages !== 0) {
+            return;
+        }
+
+        this.totalPages = this.getProperty(response, this.options.totalPagesPath);
+    };
+
+    /**
      * Event handler
      * When scroll helper is scrolled into view
      */
@@ -262,6 +280,10 @@ var Infinitum = (function () {
 
         this.loading = false;
         this.page++;
+
+        if(this.page >= this.totalPages) {
+            this.container.trigger('infinitum:end');
+        }
     };
 
     /**
@@ -288,8 +310,38 @@ var Infinitum = (function () {
             }
 
             var template = _this.renderTemplate(data);
-            _this.appendItem(template);
+            var element = _this.appendItem(template);
+
+            _this.animate(element);
         });
+    };
+
+    /**
+     * Animate the element with the transition specified in options
+     *
+     * @param {JQuery} element
+     */
+    Infinitum.prototype.animate = function (element) {
+        if( ! this.options.animation) {
+            return;
+        }
+
+        var enterClass = this.options.animation + '-enter';
+
+        element.addClass(this.options.animation);
+        element.addClass(enterClass);
+
+        if(this.options.waitForImages) {
+            element.find('img').one('load', function () {
+                element.removeClass(enterClass);
+            });
+
+            return;
+        }
+
+        setTimeout(function () {
+            element.removeClass(enterClass);
+        }, 0);
     };
 
     /**
@@ -298,7 +350,7 @@ var Infinitum = (function () {
      * @param item
      */
     Infinitum.prototype.appendItem = function (item) {
-        this.content.append(item);
+        return $(item).appendTo(this.content);
     };
 
     /**
@@ -364,7 +416,10 @@ var Infinitum = (function () {
             this.message.text(this.options.endMessage);
         }
 
-        this.message.show();
+        if(this.message.text()) {
+            this.message.show();
+        }
+
         this.spinner.hide();
         this.canLoad = false;
     };

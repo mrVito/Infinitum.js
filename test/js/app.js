@@ -6,9 +6,13 @@ $(document).ready(function () {
         contentClass: 'row',
         nextPagePath: 'next_page',
         offset: 100,
-        debug: true
+        debug: true,
+        endMessage: "No more items...",
+        animation: 'pop-in',
+        waitForImages: true
     },{
-        name: 'test',
+        name: 'title',
+        body: 'text.body',
         url: 'image'
     });
 });

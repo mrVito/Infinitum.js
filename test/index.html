@@ -3,90 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Infinitum</title>
-    <style type="text/css">
-        .loader {
-            margin: 60px auto;
-            font-size: 10px;
-            position: relative;
-            text-indent: -9999em;
-            border-top: 1.1em solid rgba(255, 255, 255, 0.2);
-            border-right: 1.1em solid rgba(255, 255, 255, 0.2);
-            border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
-            border-left: 1.1em solid #00ddff;
-            -webkit-transform: translateZ(0);
-            -ms-transform: translateZ(0);
-            transform: translateZ(0);
-            -webkit-animation: load8 1.1s infinite linear;
-            animation: load8 1.1s infinite linear;
-        }
-        .loader,
-        .loader:after {
-            border-radius: 50%;
-            width: 10em;
-            height: 10em;
-        }
-        @-webkit-keyframes load8 {
-            0% {
-                -webkit-transform: rotate(0deg);
-                transform: rotate(0deg);
-            }
-            100% {
-                -webkit-transform: rotate(360deg);
-                transform: rotate(360deg);
-            }
-        }
-        @keyframes load8 {
-            0% {
-                -webkit-transform: rotate(0deg);
-                transform: rotate(0deg);
-            }
-            100% {
-                -webkit-transform: rotate(360deg);
-                transform: rotate(360deg);
-            }
-        }
-        header {
-            height: 200px;
-            width: 100%;
-            background-color: #222;
-            margin-bottom: 24px;
-        }
-        footer {
-            height: 200px;
-            width: 100%;
-            background-color: #222;
-            margin-top: 24px;
-        }
-        .block {
-            box-shadow: 0 4px 4px rgba(0,0,0,0.4);
-            padding: 8px;
-            margin: 8px 0;
-            background-color: #fafafa;
-        }
-        .message {
-            width: 100%;
-            text-align: center;
-            padding: 16px;
-            color: #666;
-        }
-    </style>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header></header>
-<div class="container" data-load="server.php">
-</div>
+<div class="container" data-load="server.php"></div>
 <footer></footer>
+
 <template id="item-template">
     <div class="col-lg-4 text-center">
-        <div class="block">
+        <a href="{{ url }}" target="_blank" class="block">
             <h1>Hello {{ name }}</h1>
-            <p>Here is your test</p>
+            <p>Here is your test: {{ body }}</p>
             <hr>
             <img class="img img-responsive" src="{{ url }}">
-        </div>
+        </a>
     </div>
 </template>
+
 <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="js/infinitum.js"></script>
 <script src="js/app.js"></script>
