@@ -25,6 +25,14 @@ var Infinitum = (function () {
         this.template = this.getTemplateContent();
         this.container = this.getContainer();
         this.placeholderNames = this.getPlaceholderNames();
+
+        this.init();
+    }
+
+    /**
+     * Init infinitum
+     */
+    Infinitum.prototype.init = function () {
         this.content = this.insertContent();
         this.spinner = this.insertSpinner();
         this.message = this.insertMessage();
@@ -35,10 +43,11 @@ var Infinitum = (function () {
         this.loading = false;
         this.canLoad = true;
 
+        this.unbindEvents();
         this.bindEvents();
 
         this.check();
-    }
+    };
 
     /**
      * Bind event listeners
@@ -47,8 +56,21 @@ var Infinitum = (function () {
         $(window).on('scroll', this.check.bind(this));
 
         this.container.on('infinitum:scrolled-in', this.onScrolledIn.bind(this));
+        this.container.on('infinitum:reload', this.onReload.bind(this));
         this.container.on('infinitum:loaded', this.onLoaded.bind(this));
         this.container.on('infinitum:end', this.onEnd.bind(this));
+    };
+
+    /**
+     * Unbind event listeners
+     */
+    Infinitum.prototype.unbindEvents = function () {
+        $(window).off('scroll', this.check);
+
+        this.container.off('infinitum:scrolled-in', this.onScrolledIn);
+        this.container.off('infinitum:reload', this.onReload);
+        this.container.off('infinitum:loaded', this.onLoaded);
+        this.container.off('infinitum:end', this.onEnd);
     };
 
     /**
@@ -284,6 +306,15 @@ var Infinitum = (function () {
         if(this.page >= this.totalPages) {
             this.container.trigger('infinitum:end');
         }
+    };
+
+    /**
+     * Event handler
+     * When is necessary to reload items
+     */
+    Infinitum.prototype.onReload = function () {
+        this.container.empty();
+        this.init();
     };
 
     /**
