@@ -22,9 +22,13 @@ var Infinitum = (function () {
 
         this.options = $.extend({}, this.defaults, options);
         this.map = map;
+
+        // Preparing container & template
         this.template = this.getTemplateContent();
         this.container = this.getContainer();
         this.placeholderNames = this.getPlaceholderNames();
+
+        this.bindEvents();
 
         this.init();
     }
@@ -42,9 +46,7 @@ var Infinitum = (function () {
         this.page = 0;
         this.loading = false;
         this.canLoad = true;
-
-        this.unbindEvents();
-        this.bindEvents();
+        this.toReload = false;
 
         this.check();
     };
@@ -59,18 +61,6 @@ var Infinitum = (function () {
         this.container.on('infinitum:reload', this.onReload.bind(this));
         this.container.on('infinitum:loaded', this.onLoaded.bind(this));
         this.container.on('infinitum:end', this.onEnd.bind(this));
-    };
-
-    /**
-     * Unbind event listeners
-     */
-    Infinitum.prototype.unbindEvents = function () {
-        $(window).off('scroll', this.check);
-
-        this.container.off('infinitum:scrolled-in', this.onScrolledIn);
-        this.container.off('infinitum:reload', this.onReload);
-        this.container.off('infinitum:loaded', this.onLoaded);
-        this.container.off('infinitum:end', this.onEnd);
     };
 
     /**
@@ -306,6 +296,10 @@ var Infinitum = (function () {
         if(this.page >= this.totalPages) {
             this.container.trigger('infinitum:end');
         }
+
+        if (this.toReload) {
+            this.container.trigger('infinitum:reload');
+        }
     };
 
     /**
@@ -313,8 +307,12 @@ var Infinitum = (function () {
      * When is necessary to reload items
      */
     Infinitum.prototype.onReload = function () {
-        this.container.empty();
-        this.init();
+        if (!this.loading) {
+            this.container.empty();
+            this.init();
+        } else {
+            this.toReload = true;
+        }
     };
 
     /**
