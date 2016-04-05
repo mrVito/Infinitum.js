@@ -5,7 +5,10 @@ var Infinitum = (function () {
     {
         this.defaults = {
             debug: false,
+            load: null,
+            map: {},
             template: '#item-template',
+            templateRenderer: undefined,
             container: 'body',
             contentClass: '',
             spinnerClass: 'loader',
@@ -20,13 +23,17 @@ var Infinitum = (function () {
             waitForImages: false
         };
 
+        if (options === undefined) {
+            options = map;
+            map = options.map;
+        }
+
         this.options = $.extend({}, this.defaults, options);
         this.map = map;
 
         // Preparing container & template
         this.template = this.getTemplateContent();
         this.container = this.getContainer();
-        this.placeholderNames = this.getPlaceholderNames();
 
         this.bindEvents();
 
@@ -37,11 +44,13 @@ var Infinitum = (function () {
      * Init infinitum
      */
     Infinitum.prototype.init = function () {
+        var options = this.options;
+
         this.content = this.insertContent();
         this.spinner = this.insertSpinner();
         this.message = this.insertMessage();
         this.scrollHelper = this.insertScrollHelper();
-        this.nextPage = this.parseSource();
+        this.nextPage = options.load ? options.load : this.parseSource();
         this.totalPages = 0;
         this.page = 0;
         this.loading = false;
@@ -329,11 +338,16 @@ var Infinitum = (function () {
      * @param response
      */
     Infinitum.prototype.render = function (response) {
-        var _this = this;
+        var _this = this,
+            placeholderNames = this.getPlaceholderNames();
 
         response.forEach(function (item) {
+            var data = item;
+
             try {
-                var data = _this.parseData(item);
+                if (_this.options.templateRenderer === undefined) {
+                    data = _this.parseData(item);
+                }
             } catch(e) {
                 throw 'Cannot render template: ' + e;
             }
@@ -407,10 +421,14 @@ var Infinitum = (function () {
     Infinitum.prototype.renderTemplate = function (data) {
         var rendered = this.template;
 
-        this.placeholderNames.forEach(function (placeholder) {
-            var pattern = new RegExp("{{ *" + placeholder + " *}}", "g");
-            rendered = rendered.replace(pattern, data[placeholder])
-        });
+        if (this.options.templateRenderer) {
+            rendered = this.options.templateRenderer(this.template, data)
+        } else {
+            placeholderNames.forEach(function (placeholder) {
+                var pattern = new RegExp("{{ *" + placeholder + " *}}", "g");
+                rendered = rendered.replace(pattern, data[placeholder])
+            });
+        }
 
         return rendered;
     };
